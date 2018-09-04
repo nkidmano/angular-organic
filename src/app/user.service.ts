@@ -1,23 +1,30 @@
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
-import * as firebase from 'firebase';
-import { AppUser } from './models/app-user';
-import { Observable } from 'rxjs';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Product } from './models/product';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class ProductService {
   constructor(private db: AngularFireDatabase) {}
 
-  save(user: firebase.User) {
-    this.db.object('/users/' + user.uid).update({
-      name: user.displayName,
-      email: user.email
-    });
+  create(product: Product) {
+    return this.db.list('/products').push(product);
   }
 
-  get(uid: string): Observable<any> {
-    return this.db.object('/users/' + uid).valueChanges();
+  getAll() {
+    return this.db.list('/products').snapshotChanges();
+  }
+
+  get(productId) {
+    return this.db.object(`/products/${productId}`).valueChanges();
+  }
+
+  update(productId, product) {
+    return this.db.object(`/products/${productId}`).update(product);
+  }
+
+  delete(productId) {
+    return this.db.object(`/products/${productId}`).remove();
   }
 }
